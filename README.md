@@ -36,6 +36,9 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
+* [x] Keeping API key out of git repo
+* [x] Restoring the state upon activity recreation
+* [x] Custom app icon
 * [ ] Show progress bar when article is loading
 
 ## Video Walkthrough
