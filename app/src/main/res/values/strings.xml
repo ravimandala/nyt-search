@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">NYT Search</string>
+    <string name="app_title">New York Times Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="search">Search</string>
+    <string name="hint">Enter search query</string>
+    <string name="title_activity_article">ArticleActivity</string>
+    <string name="begin_date">Begin Date</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="newest">Newest</string>
+    <string name="oldest">Oldest</string>
+    <string name="news_desk_values">News Desk Values</string>
+    <string name="check_arts">Arts</string>
+    <string name="check_fashion_and_style"><![CDATA[Fashion & Style]]></string>
+    <string name="check_sports">Sports</string>
+    <string name="save">Save</string>
+    <string-array name="sort_order_array">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
+</resources>

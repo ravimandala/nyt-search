@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ravimandala.labs.nytimessearch.activity.SettingsActivity">
+
+    <TextView
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/begin_date"
+        android:id="@+id/tvBeginDate"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/etBeginDate"
+        android:gravity="bottom" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/etBeginDate"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/tvBeginDate"
+        android:layout_toEndOf="@+id/tvBeginDate"
+        android:onClick="showDatePickerDialog"
+        android:editable="false"/>
+
+    <TextView
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/sort_order"
+        android:id="@+id/tvSortOrder"
+        android:layout_below="@+id/tvBeginDate"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="44dp"
+        android:layout_toLeftOf="@+id/etBeginDate"
+        android:layout_toStartOf="@+id/etBeginDate" />
+
+    <!--<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignBottom="@+id/tvSortOrder"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_toRightOf="@+id/tvSortOrder"-->
+        <!--android:layout_toEndOf="@+id/tvSortOrder"-->
+        <!--android:orientation="vertical">-->
+        <!--<RadioButton android:id="@+id/radio_pirates"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/newest"-->
+            <!--android:onClick="onRadioButtonClicked"/>-->
+        <!--<RadioButton android:id="@+id/radio_ninjas"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/oldest"-->
+            <!--android:onClick="onRadioButtonClicked"/>-->
+    <!--</RadioGroup>-->
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spSortOrder"
+        android:layout_alignBottom="@+id/tvSortOrder"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/tvSortOrder"
+        android:layout_toEndOf="@+id/tvSortOrder"
+        android:spinnerMode="dropdown"
+        android:entries="@array/sort_order_array"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/news_desk_values"
+        android:id="@+id/textView"
+        android:layout_below="@+id/tvSortOrder"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="39dp"
+        android:layout_toLeftOf="@+id/spSortOrder"
+        android:layout_toStartOf="@+id/spSortOrder" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView"
+        android:layout_toRightOf="@+id/textView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/linearLayout">
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/check_arts"
+            android:id="@+id/checkBox"
+            android:checked="false"
+            android:onClick="onCheckBoxSelected"
+            android:tag="arts"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/check_fashion_and_style"
+            android:id="@+id/checkBox2"
+            android:onClick="onCheckBoxSelected"
+            android:checked="false"
+            android:tag="fashion_and_style"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/check_sports"
+            android:id="@+id/checkBox3"
+            android:checked="false"
+            android:onClick="onCheckBoxSelected"
+            android:tag="sports"/>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:id="@+id/button"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:onClick="onSaveSettingsClicked" />
+</RelativeLayout>
