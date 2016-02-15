@@ -2,14 +2,15 @@ package com.ravimandala.labs.nytimessearch.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.ravimandala.labs.nytimessearch.Constants;
 import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.fragment.DatePickerFragment;
 import com.ravimandala.labs.nytimessearch.model.Settings;
@@ -39,12 +40,7 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
     @Bind(R.id.cbSports)
     CheckBox cbSports;
 
-    Calendar cal = Calendar.getInstance();
-    Settings settings;
-
-    public static final int ARTS = 1 << 0;
-    public static final int FASHION_AND_STYLE = 1 << 1;
-    public static final int SPORTS = 1 << 2;
+    private Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
         if (settings.isOldestFirst()) {
             spSortOrder.setSelection(1);
         } else {
-            spSortOrder.setSelection(1);
+            spSortOrder.setSelection(0);
         }
         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
         etBeginDate.setText(df.format(settings.getBeginDate()));
@@ -73,7 +69,9 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
     // handle the date selected
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        settings.setBeginDate(new Date(year, monthOfYear, dayOfMonth));
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, monthOfYear, dayOfMonth);
+        settings.setBeginDate(cal.getTime());
         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
         etBeginDate.setText(df.format(settings.getBeginDate()));
     }
@@ -82,9 +80,9 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
         settings.setIsOldestFirst(spSortOrder.getSelectedItemId() == 1 );
 
         int newsDeskValues = 0;
-        if (cbArts.isChecked()) newsDeskValues += ARTS;
-        if (cbFashionAndStyle.isChecked()) newsDeskValues += FASHION_AND_STYLE;
-        if (cbSports.isChecked()) newsDeskValues += SPORTS;
+        if (cbArts.isChecked()) newsDeskValues += Constants.ARTS;
+        if (cbFashionAndStyle.isChecked()) newsDeskValues += Constants.FASHION_AND_STYLE;
+        if (cbSports.isChecked()) newsDeskValues += Constants.SPORTS;
         settings.setNewsDeskValues(newsDeskValues);
 
         // Prepare data intent

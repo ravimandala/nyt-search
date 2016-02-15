@@ -11,8 +11,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class Article implements Parcelable {
-    private static final String TAG = "NYTSearch";
-
     String webUrl;
     String headline;
     String thumbnailURL;
@@ -46,7 +44,6 @@ public class Article implements Parcelable {
                     }
                 }
             }
-            Log.d(TAG, "Creating Article - " + this.toString());
         } catch(JSONException e) {
             e.printStackTrace();
         }

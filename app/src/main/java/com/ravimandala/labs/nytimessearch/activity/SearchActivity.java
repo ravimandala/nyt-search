@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.ravimandala.labs.nytimessearch.Constants;
 import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.adapter.ArticlesAdapter;
 import com.ravimandala.labs.nytimessearch.adapter.EndlessRecyclerViewScrollListener;
@@ -30,25 +31,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class SearchActivity extends AppCompatActivity {
-    private static final String TAG = "NYTSearch";
     private static final int SETTINGS = 101;
-    private static final String API_BASE_URL = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
-    private static final String SEARCH_QUERY = "searchQuery";
-    private static final String RESULTS_PAGE = "resultsPage";
-
-    public static final int ARTS = 1 << 0;
-    public static final int FASHION_AND_STYLE = 1 << 1;
-    public static final int SPORTS = 1 << 2;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -67,8 +59,6 @@ public class SearchActivity extends AppCompatActivity {
 
     ArrayList<Article> articles = new ArrayList<>();
     ArticlesAdapter adapter;
-    Calendar cal = Calendar.getInstance();
-    String sortOrder;
     String query;
     int currPage;
     Settings settings;
@@ -82,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         adapter = new ArticlesAdapter(articles);
         rvResults.setAdapter(adapter);
-//        rvResults.setItemAnimator(new SlideInUpAnimator());
+//        rvResults.setItemAnimator(new SlideInUpAnimator());  // Resulting in runtime exceptions
         final StaggeredGridLayoutManager lmStaggeredGrid =
                 new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
         rvResults.setLayoutManager(lmStaggeredGrid);
@@ -126,13 +116,12 @@ public class SearchActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             settings = savedInstanceState.getParcelable("settings");
         }
-        currPage = 0;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(SEARCH_QUERY, query);
-        outState.putInt(RESULTS_PAGE, currPage);
+        outState.putString(Constants.SEARCH_QUERY, query);
+        outState.putInt(Constants.RESULTS_PAGE, currPage);
         super.onSaveInstanceState(outState);
     }
 
@@ -140,8 +129,8 @@ public class SearchActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        etQuery.setText(savedInstanceState.getString(SEARCH_QUERY));
-        currPage = savedInstanceState.getInt(RESULTS_PAGE);
+        etQuery.setText(savedInstanceState.getString(Constants.SEARCH_QUERY));
+        currPage = savedInstanceState.getInt(Constants.RESULTS_PAGE);
         btnSearch.callOnClick();
     }
 
@@ -155,9 +144,9 @@ public class SearchActivity extends AppCompatActivity {
             params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
             StringBuilder sb = new StringBuilder();
             int newsDeskValues = settings.getNewsDeskValues();
-            boolean isArts = (newsDeskValues ^ ARTS) == 1;
-            boolean isFashionAndStyle = (newsDeskValues ^ FASHION_AND_STYLE) == 1;
-            boolean isSports = (newsDeskValues ^ SPORTS) == 1;
+            boolean isArts = (newsDeskValues ^ Constants.ARTS) == 1;
+            boolean isFashionAndStyle = (newsDeskValues ^ Constants.FASHION_AND_STYLE) == 1;
+            boolean isSports = (newsDeskValues ^ Constants.SPORTS) == 1;
 
             if (isArts) sb.append(" \"Arts\" ");
             if (isFashionAndStyle) sb.append(" \"Fashion\" ");
@@ -166,22 +155,21 @@ public class SearchActivity extends AppCompatActivity {
             params.add("fq", "news_desk:( " + sb.toString() + " )");
         }
 
-        Log.d(TAG, "Base URL = " + API_BASE_URL);
-        Log.d(TAG, "Params = " + params.toString());
+        Log.d(Constants.TAG, "Base URL = " + Constants.API_BASE_URL);
+        Log.d(Constants.TAG, "Params = " + params.toString());
         // Send an API request to retrieve appropriate data using the offset value as a parameter.
         // Deserialize API response and then construct new objects to append to the adapter
         // Add the new objects to the data source for the adapter
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get(API_BASE_URL, params, new JsonHttpResponseHandler() {
+        client.get(Constants.API_BASE_URL, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray jsonResults = null;
                 int currSize = articles.size();
 
-                Log.d(TAG, "Got the response with resultCode: " + statusCode);
+                Log.d(Constants.TAG, "Got the response with resultCode: " + statusCode);
                 try {
                     if (response.optJSONObject("response") != null) {
-                        // adapter.clear();
                         adapter.addAll(Article.fromJSONArray(response.getJSONObject("response").getJSONArray("docs")));
                         // For efficiency purposes, notify the adapter of only the elements that got changed
                         // curSize will equal to the index of the first element inserted because the list is 0-indexed
@@ -190,7 +178,7 @@ public class SearchActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, articles.toString());
+                Log.d(Constants.TAG, articles.toString());
                 swipeRefreshLayout.setRefreshing(false);
                 return;
             }
@@ -228,7 +216,8 @@ public class SearchActivity extends AppCompatActivity {
     public void onArticleSearch(View view) {
         query = etQuery.getText().toString();
 
-         adapter.clear();
+        currPage = 0;
+        adapter.clear();
         customLoadDataFromApi(currPage);
     }
 
