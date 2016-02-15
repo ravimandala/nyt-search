@@ -4,21 +4,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.ravimandala.labs.nytimessearch.Constants;
+import com.ravimandala.labs.nytimessearch.utils.Constants;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class Settings implements Parcelable {
-    Date beginDate;
+    Calendar beginDate;
     boolean isOldestFirst;
     int newsDeskValues;
 
-    public Date getBeginDate() {
+    public Calendar getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(Calendar beginDate) {
         this.beginDate = beginDate;
     }
 
@@ -38,6 +37,32 @@ public class Settings implements Parcelable {
         this.newsDeskValues = newsDeskValues;
     }
 
+    public Settings() {
+        this.beginDate = Calendar.getInstance();
+        this.isOldestFirst = false;
+        this.newsDeskValues = 0;
+
+        Log.d(Constants.TAG, "Created Settings: " + this.toString());
+    }
+
+    public Settings(Settings settings) {
+        if (settings != null) {
+            this.beginDate = (Calendar) settings.getBeginDate().clone();
+            this.isOldestFirst = settings.isOldestFirst();
+            this.newsDeskValues = settings.getNewsDeskValues();
+        } else {
+            this.beginDate = Calendar.getInstance();
+            this.isOldestFirst = false;
+            this.newsDeskValues = 0;
+        }
+        Log.d(Constants.TAG, "Created Settings: " + this.toString());
+    }
+
+    @Override
+    public String toString() {
+        return "BeginDate: " + beginDate.toString() + "; isOldestFirst = " + isOldestFirst + "; newsDeskValues = " + newsDeskValues;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -45,26 +70,15 @@ public class Settings implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(beginDate != null ? beginDate.getTime() : -1);
+        dest.writeSerializable(this.beginDate);
         dest.writeByte(isOldestFirst ? (byte) 1 : (byte) 0);
         dest.writeInt(this.newsDeskValues);
     }
 
-    public Settings() {
-        this.beginDate = Calendar.getInstance().getTime();
-        this.isOldestFirst = false;
-        this.newsDeskValues = 0;
-
-        Log.d(Constants.TAG, "Created Settings: " + this.toString());
-    }
-
     protected Settings(Parcel in) {
-        long tmpBeginDate = in.readLong();
-        this.beginDate = tmpBeginDate == -1 ? null : new Date(tmpBeginDate);
+        this.beginDate = (Calendar) in.readSerializable();
         this.isOldestFirst = in.readByte() != 0;
         this.newsDeskValues = in.readInt();
-
-        Log.d(Constants.TAG, "Created Settings from parcel: " + this.toString());
     }
 
     public static final Parcelable.Creator<Settings> CREATOR = new Parcelable.Creator<Settings>() {
@@ -76,9 +90,4 @@ public class Settings implements Parcelable {
             return new Settings[size];
         }
     };
-
-    @Override
-    public String toString() {
-        return "BeginDate: " + beginDate + "; isOldestFirst = " + isOldestFirst + "; newsDeskValues = " + newsDeskValues;
-    }
 }

@@ -11,9 +11,9 @@ import java.util.Date;
 
 public class DatePickerFragment extends DialogFragment {
     private static final String TAG = "NYTSearch";
-    Date beginDate;
+    Calendar beginDate;
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(Calendar beginDate) {
         this.beginDate = beginDate;
     }
 
@@ -21,13 +21,15 @@ public class DatePickerFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker
         if (beginDate == null)
-            beginDate = Calendar.getInstance().getTime();
+            beginDate = Calendar.getInstance();
 
         // Activity needs to implement this interface
         DatePickerDialog.OnDateSetListener listener = (DatePickerDialog.OnDateSetListener) getActivity();
 
-        Log.d(TAG, "Opening DatePickerDialog with date: " + beginDate.toString());
-        // Create a new instance of TimePickerDialog and return it
-        return new DatePickerDialog(getActivity(), listener, beginDate.getYear(), beginDate.getMonth(), beginDate.getDay());
+        return new DatePickerDialog(getActivity(),
+                listener,
+                beginDate.get(Calendar.YEAR),
+                beginDate.get(Calendar.MONTH),
+                beginDate.get(Calendar.DAY_OF_MONTH));
     }
 }

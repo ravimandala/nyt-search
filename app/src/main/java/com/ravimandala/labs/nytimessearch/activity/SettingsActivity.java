@@ -10,14 +10,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.ravimandala.labs.nytimessearch.Constants;
 import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.fragment.DatePickerFragment;
 import com.ravimandala.labs.nytimessearch.model.Settings;
+import com.ravimandala.labs.nytimessearch.utils.Constants;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import butterknife.Bind;
@@ -48,15 +47,25 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
         setContentView(R.layout.activity_settings);
 
         ButterKnife.bind(this);
-        settings = getIntent().getParcelableExtra("settings");
-        if (settings == null) settings = new Settings();
+        if (getIntent().hasExtra("settings")) {
+            settings = new Settings((Settings) getIntent().getParcelableExtra("settings"));
+        } else {
+            settings = new Settings();
+        }
         if (settings.isOldestFirst()) {
             spSortOrder.setSelection(1);
         } else {
             spSortOrder.setSelection(0);
         }
+        if ((settings.getNewsDeskValues() & Constants.ARTS) != 0)
+            cbArts.setChecked(true);
+        if ((settings.getNewsDeskValues() & Constants.FASHION_AND_STYLE) != 0)
+            cbFashionAndStyle.setChecked(true);
+        if ((settings.getNewsDeskValues() & Constants.SPORTS) != 0)
+            cbSports.setChecked(true);
+
         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
-        etBeginDate.setText(df.format(settings.getBeginDate()));
+        etBeginDate.setText(df.format(settings.getBeginDate().getTime()));
     }
 
     // attach to an onclick handler to show the date picker
@@ -71,9 +80,9 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         Calendar cal = Calendar.getInstance();
         cal.set(year, monthOfYear, dayOfMonth);
-        settings.setBeginDate(cal.getTime());
+        settings.setBeginDate(cal);
         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
-        etBeginDate.setText(df.format(settings.getBeginDate()));
+        etBeginDate.setText(df.format(settings.getBeginDate().getTime()));
     }
 
     public void onSaveSettingsClicked(View view) {

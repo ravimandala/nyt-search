@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,10 +21,11 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.ravimandala.labs.nytimessearch.Constants;
 import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.adapter.ArticlesAdapter;
-import com.ravimandala.labs.nytimessearch.adapter.EndlessRecyclerViewScrollListener;
+import com.ravimandala.labs.nytimessearch.utils.Constants;
+import com.ravimandala.labs.nytimessearch.misc.DividerItemDecoration;
+import com.ravimandala.labs.nytimessearch.misc.EndlessRecyclerViewScrollListener;
 import com.ravimandala.labs.nytimessearch.model.Article;
 import com.ravimandala.labs.nytimessearch.model.Settings;
 
@@ -37,7 +39,6 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class SearchActivity extends AppCompatActivity {
     private static final int SETTINGS = 101;
@@ -72,6 +73,8 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         adapter = new ArticlesAdapter(articles);
         rvResults.setAdapter(adapter);
+        rvResults.addItemDecoration(new DividerItemDecoration(getApplicationContext(),
+                getResources().getConfiguration().orientation));
 //        rvResults.setItemAnimator(new SlideInUpAnimator());  // Resulting in runtime exceptions
         final StaggeredGridLayoutManager lmStaggeredGrid =
                 new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
@@ -120,8 +123,10 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(Constants.TAG, "Saving instance");
         outState.putString(Constants.SEARCH_QUERY, query);
         outState.putInt(Constants.RESULTS_PAGE, currPage);
+        outState.putParcelable(Constants.SETTINGS, settings);
         super.onSaveInstanceState(outState);
     }
 
@@ -129,8 +134,11 @@ public class SearchActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
+        Log.d(Constants.TAG, "Restoring saved instance");
+
         etQuery.setText(savedInstanceState.getString(Constants.SEARCH_QUERY));
         currPage = savedInstanceState.getInt(Constants.RESULTS_PAGE);
+        settings = savedInstanceState.getParcelable(Constants.SETTINGS);
         btnSearch.callOnClick();
     }
 
@@ -140,7 +148,7 @@ public class SearchActivity extends AppCompatActivity {
         params.add("api-key", getResources().getString(R.string.api_key));
         params.add("page", String.valueOf(page));
         if (settings != null) {
-            params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate()));  // YYYYMMDD
+            params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate().getTime()));  // YYYYMMDD
             params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
             StringBuilder sb = new StringBuilder();
             int newsDeskValues = settings.getNewsDeskValues();
