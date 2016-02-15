@@ -50,9 +50,6 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 viewHolder = new ViewHolderNoImage(parent.getContext(),
                         inflater.inflate(R.layout.item_article_result, parent, false));
                 break;
-//            default: // Assuming view without image
-//                viewHolder = new RecyclerViewSimpleTextViewHolder (
-//                        inflater.inflate(android.R.layout.simple_list_item_1, parent, false));
         }
 
         return viewHolder;

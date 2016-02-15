@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
 
         ButterKnife.bind(this);
         settings = getIntent().getParcelableExtra("settings");
-
+        if (settings == null) settings = new Settings();
         if (settings.isOldestFirst()) {
             spSortOrder.setSelection(1);
         } else {

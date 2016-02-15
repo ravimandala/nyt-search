@@ -126,7 +126,6 @@ public class SearchActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             settings = savedInstanceState.getParcelable("settings");
         }
-        if (settings == null) settings = new Settings();
         currPage = 0;
     }
 
@@ -151,20 +150,24 @@ public class SearchActivity extends AppCompatActivity {
         params.add("q", query);
         params.add("api-key", getResources().getString(R.string.api_key));
         params.add("page", String.valueOf(page));
-        params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate()));  // YYYYMMDD
-        params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
-        StringBuilder sb = new StringBuilder();
-        int newsDeskValues = settings.getNewsDeskValues();
-        boolean isArts = (newsDeskValues ^ ARTS) == 1;
-        boolean isFashionAndStyle = (newsDeskValues ^ FASHION_AND_STYLE) == 1;
-        boolean isSports = (newsDeskValues ^ SPORTS) == 1;
+        if (settings != null) {
+            params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate()));  // YYYYMMDD
+            params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
+            StringBuilder sb = new StringBuilder();
+            int newsDeskValues = settings.getNewsDeskValues();
+            boolean isArts = (newsDeskValues ^ ARTS) == 1;
+            boolean isFashionAndStyle = (newsDeskValues ^ FASHION_AND_STYLE) == 1;
+            boolean isSports = (newsDeskValues ^ SPORTS) == 1;
 
-        if (isArts) sb.append(" \"Arts\" ");
-        if (isFashionAndStyle) sb.append(" \"Fashion\" ");
-        if (isSports) sb.append(" \"Sports\" ");
+            if (isArts) sb.append(" \"Arts\" ");
+            if (isFashionAndStyle) sb.append(" \"Fashion\" ");
+            if (isSports) sb.append(" \"Sports\" ");
 
-        params.add("fq", "news_desk:( " + sb.toString() + " )");
+            params.add("fq", "news_desk:( " + sb.toString() + " )");
+        }
 
+        Log.d(TAG, "Base URL = " + API_BASE_URL);
+        Log.d(TAG, "Params = " + params.toString());
         // Send an API request to retrieve appropriate data using the offset value as a parameter.
         // Deserialize API response and then construct new objects to append to the adapter
         // Add the new objects to the data source for the adapter
@@ -178,6 +181,7 @@ public class SearchActivity extends AppCompatActivity {
                 Log.d(TAG, "Got the response with resultCode: " + statusCode);
                 try {
                     if (response.optJSONObject("response") != null) {
+                        // adapter.clear();
                         adapter.addAll(Article.fromJSONArray(response.getJSONObject("response").getJSONArray("docs")));
                         // For efficiency purposes, notify the adapter of only the elements that got changed
                         // curSize will equal to the index of the first element inserted because the list is 0-indexed
