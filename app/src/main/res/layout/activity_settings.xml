@@ -79,7 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/news_desk_values"
+        android:text="@string/newsDeskValues"
         android:id="@+id/textView"
         android:layout_below="@+id/tvSortOrder"
         android:layout_alignParentLeft="true"
@@ -102,17 +102,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/check_arts"
-            android:id="@+id/checkBox"
+            android:id="@+id/cbArts"
             android:checked="false"
-            android:onClick="onCheckBoxSelected"
             android:tag="arts"/>
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/check_fashion_and_style"
-            android:id="@+id/checkBox2"
-            android:onClick="onCheckBoxSelected"
+            android:id="@+id/cbFashionAndStyle"
             android:checked="false"
             android:tag="fashion_and_style"/>
 
@@ -120,9 +118,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/check_sports"
-            android:id="@+id/checkBox3"
+            android:id="@+id/cbSports"
             android:checked="false"
-            android:onClick="onCheckBoxSelected"
             android:tag="sports"/>
     </LinearLayout>
 

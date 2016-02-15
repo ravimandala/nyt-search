@@ -24,19 +24,20 @@ import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.adapter.ArticlesAdapter;
 import com.ravimandala.labs.nytimessearch.adapter.EndlessRecyclerViewScrollListener;
 import com.ravimandala.labs.nytimessearch.model.Article;
+import com.ravimandala.labs.nytimessearch.model.Settings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class SearchActivity extends AppCompatActivity {
     private static final String TAG = "NYTSearch";
@@ -44,6 +45,10 @@ public class SearchActivity extends AppCompatActivity {
     private static final String API_BASE_URL = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
     private static final String SEARCH_QUERY = "searchQuery";
     private static final String RESULTS_PAGE = "resultsPage";
+
+    public static final int ARTS = 1 << 0;
+    public static final int FASHION_AND_STYLE = 1 << 1;
+    public static final int SPORTS = 1 << 2;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -66,6 +71,7 @@ public class SearchActivity extends AppCompatActivity {
     String sortOrder;
     String query;
     int currPage;
+    Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,9 +123,11 @@ public class SearchActivity extends AppCompatActivity {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        if (savedInstanceState != null) {
+            settings = savedInstanceState.getParcelable("settings");
+        }
+        if (settings == null) settings = new Settings();
         currPage = 0;
-        cal.setTime(new Date());
-        sortOrder = "Newest";
     }
 
     @Override
@@ -143,6 +151,19 @@ public class SearchActivity extends AppCompatActivity {
         params.add("q", query);
         params.add("api-key", getResources().getString(R.string.api_key));
         params.add("page", String.valueOf(page));
+        params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate()));  // YYYYMMDD
+        params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
+        StringBuilder sb = new StringBuilder();
+        int newsDeskValues = settings.getNewsDeskValues();
+        boolean isArts = (newsDeskValues ^ ARTS) == 1;
+        boolean isFashionAndStyle = (newsDeskValues ^ FASHION_AND_STYLE) == 1;
+        boolean isSports = (newsDeskValues ^ SPORTS) == 1;
+
+        if (isArts) sb.append(" \"Arts\" ");
+        if (isFashionAndStyle) sb.append(" \"Fashion\" ");
+        if (isSports) sb.append(" \"Sports\" ");
+
+        params.add("fq", "news_desk:( " + sb.toString() + " )");
 
         // Send an API request to retrieve appropriate data using the offset value as a parameter.
         // Deserialize API response and then construct new objects to append to the adapter
@@ -209,23 +230,14 @@ public class SearchActivity extends AppCompatActivity {
 
     public void settingsClicked(MenuItem item) {
         Intent intent = new Intent(this, SettingsActivity.class);
-
-        intent.putExtra("begin_date_year", cal.get(Calendar.YEAR));
-        intent.putExtra("begin_date_month", cal.get(Calendar.MONTH));
-        intent.putExtra("begin_date_day", cal.get(Calendar.DAY_OF_MONTH));
-        intent.putExtra("sort_order", sortOrder);
-
+        intent.putExtra("settings", settings);
         startActivityForResult(intent, SETTINGS);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SETTINGS && resultCode == RESULT_OK) {
-            cal.set(data.getIntExtra("begin_date_year", 2016),
-                    data.getIntExtra("begin_date_month", 1),
-                    data.getIntExtra("begin_date_day", 1));
-            Log.d(TAG, "Date: " + cal.getTime());
-            sortOrder = data.getStringExtra("sort_order");
+            settings = data.getParcelableExtra("settings");
         }
     }
 }

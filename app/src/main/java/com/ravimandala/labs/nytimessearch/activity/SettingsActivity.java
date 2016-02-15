@@ -4,20 +4,19 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
-import android.widget.TextView;
 
 import com.ravimandala.labs.nytimessearch.R;
 import com.ravimandala.labs.nytimessearch.fragment.DatePickerFragment;
+import com.ravimandala.labs.nytimessearch.model.Settings;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import butterknife.Bind;
@@ -31,7 +30,21 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
     @Bind(R.id.spSortOrder)
     Spinner spSortOrder;
 
+    @Bind(R.id.cbArts)
+    CheckBox cbArts;
+
+    @Bind(R.id.cbFashionAndStyle)
+    CheckBox cbFashionAndStyle;
+
+    @Bind(R.id.cbSports)
+    CheckBox cbSports;
+
     Calendar cal = Calendar.getInstance();
+    Settings settings;
+
+    public static final int ARTS = 1 << 0;
+    public static final int FASHION_AND_STYLE = 1 << 1;
+    public static final int SPORTS = 1 << 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,54 +52,44 @@ public class SettingsActivity extends AppCompatActivity implements DatePickerDia
         setContentView(R.layout.activity_settings);
 
         ButterKnife.bind(this);
-        Intent inputIntent = getIntent();
-        cal.set(inputIntent.getIntExtra("begin_date_year", 2016),
-                inputIntent.getIntExtra("begin_date_month", 1),
-                inputIntent.getIntExtra("begin_date_day", 1));
-        setSpinnerToValue(spSortOrder, inputIntent.getStringExtra("sort_order"));
-    }
+        settings = getIntent().getParcelableExtra("settings");
 
-    public void setSpinnerToValue(Spinner spinner, String value) {
-        int index = 0;
-        SpinnerAdapter adapter = spinner.getAdapter();
-        for (int i = 0; i < adapter.getCount(); i++) {
-            if (adapter.getItem(i).equals(value)) {
-                index = i;
-                break; // terminate loop
-            }
+        if (settings.isOldestFirst()) {
+            spSortOrder.setSelection(1);
+        } else {
+            spSortOrder.setSelection(1);
         }
-        spinner.setSelection(index);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
+        etBeginDate.setText(df.format(settings.getBeginDate()));
     }
 
     // attach to an onclick handler to show the date picker
     public void showDatePickerDialog(View v) {
         DatePickerFragment newFragment = new DatePickerFragment();
+        newFragment.setBeginDate(settings.getBeginDate());
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
     // handle the date selected
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-
-        cal.set(year, monthOfYear, dayOfMonth);
-
+        settings.setBeginDate(new Date(year, monthOfYear, dayOfMonth));
         DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
-        etBeginDate.setText(df.format(cal.getTime()));
-    }
-
-    public void onCheckBoxSelected(View view) {
-        // Do something
+        etBeginDate.setText(df.format(settings.getBeginDate()));
     }
 
     public void onSaveSettingsClicked(View view) {
+        settings.setIsOldestFirst(spSortOrder.getSelectedItemId() == 1 );
+
+        int newsDeskValues = 0;
+        if (cbArts.isChecked()) newsDeskValues += ARTS;
+        if (cbFashionAndStyle.isChecked()) newsDeskValues += FASHION_AND_STYLE;
+        if (cbSports.isChecked()) newsDeskValues += SPORTS;
+        settings.setNewsDeskValues(newsDeskValues);
+
         // Prepare data intent
         Intent data = new Intent();
-        // Pass relevant data back as a result
-        data.putExtra("begin_date_year", cal.get(Calendar.YEAR));
-        data.putExtra("begin_date_month", cal.get(Calendar.MONTH));
-        data.putExtra("begin_date_day", cal.get(Calendar.DAY_OF_MONTH));
-        data.putExtra("sort_order", spSortOrder.getSelectedItem().toString());
+        data.putExtra("settings", settings);
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response
         finish(); // closes the activity, pass data to parent
