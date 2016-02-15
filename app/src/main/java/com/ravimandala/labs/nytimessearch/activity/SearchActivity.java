@@ -150,17 +150,18 @@ public class SearchActivity extends AppCompatActivity {
         if (settings != null) {
             params.add("begin_date", new SimpleDateFormat("yyyyMMdd").format(settings.getBeginDate().getTime()));  // YYYYMMDD
             params.add("sort", settings.isOldestFirst() ? "oldest" : "newest");
-            StringBuilder sb = new StringBuilder();
             int newsDeskValues = settings.getNewsDeskValues();
-            boolean isArts = (newsDeskValues ^ Constants.ARTS) == 1;
-            boolean isFashionAndStyle = (newsDeskValues ^ Constants.FASHION_AND_STYLE) == 1;
-            boolean isSports = (newsDeskValues ^ Constants.SPORTS) == 1;
+            if (newsDeskValues != 0) {
+                StringBuilder sb = new StringBuilder();
 
-            if (isArts) sb.append(" \"Arts\" ");
-            if (isFashionAndStyle) sb.append(" \"Fashion\" ");
-            if (isSports) sb.append(" \"Sports\" ");
-
-            params.add("fq", "news_desk:( " + sb.toString() + " )");
+                if ((newsDeskValues & Constants.ARTS) != 0)
+                    sb.append(" \"Arts\" ");
+                if ((newsDeskValues & Constants.FASHION_AND_STYLE) != 0)
+                    sb.append(" \"Fashion\" ");
+                if ((newsDeskValues & Constants.SPORTS) != 0)
+                    sb.append(" \"Sports\" ");
+                params.add("fq", "news_desk:( " + sb.toString() + " )");
+            }
         }
 
         Log.d(Constants.TAG, "Base URL = " + Constants.API_BASE_URL);
