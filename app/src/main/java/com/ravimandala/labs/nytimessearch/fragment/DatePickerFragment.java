@@ -1,13 +1,11 @@
 package com.ravimandala.labs.nytimessearch.fragment;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class DatePickerFragment extends DialogFragment {
     private static final String TAG = "NYTSearch";
